@@ -1,0 +1,43 @@
+//Defining where the LED is connected on the Photon
+int blueLed=D0;
+int greenLed=D1;
+int redLed=D2;
+//Define a function called lightColor
+int lightColor(String command); 
+void setup() {
+ pinMode(redLed,OUTPUT);
+ pinMode(blueLed,OUTPUT);
+ pinMode(greenLed,OUTPUT);
+//This is where you are basically pinging the Photon and calling the lightColor function we defined earlier
+Particle.function("ledColor", lightColor);
+ 
+}
+void loop() {
+//Nothing to see here 
+}
+//Define a function called setColor that will basically assign the color values to the LED pins
+void setColor(int redValue, int greenValue, int blueValue) {
+ analogWrite(redLed, redValue);
+ analogWrite(greenLed, greenValue);
+ analogWrite(blueLed, blueValue);
+}
+//Instantiating the lightColor function
+int lightColor(String command){
+//This is for us to see what data we're sending to the Photon
+Particle.publish(command);
+//We'll use a string parser to basically extract the RGB values from a string we pass to the Photon.
+ int value[3];
+ const char* stringArgs = command.c_str();
+ Serial.println(stringArgs);
+ char* myCopy = strtok(strdup(stringArgs), ",");
+ for (int i = 0; i < 3; i++)
+ {
+ value[i]= atoi(myCopy);
+ Serial.println(value[i]);
+ myCopy = strtok(NULL, ",");
+ }
+ setColor(value[0],value[1],value[2]);
+ //For the function's sanity
+ return 0;
+}
+//That's all folks!
